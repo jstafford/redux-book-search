@@ -1,73 +1,56 @@
-import React from 'react';
-import Book from './book.js';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+// @flow
+import React, {Component} from 'react'
+import {connect} from 'react-redux'
+import {TransitionGroup, CSSTransition} from 'react-transition-group'
+import Book from './Book.js'
+import Spinner from './Spinner'
 
-const Books = ({
-  books,
-  displayMode,
-  currentStatus,
-}) => {
-  const styles = {
-    container: {
-      width: '100%',
-    },
+class Books extends Component<{
+  books: Array<Object>,
+  displayMode: string,
+  isFetching: bool,
+}> {
 
-    spinner: {
-      textAlign: 'center',
-      width: '100%',
-    },
-  };
+  render () {
+    const {books, displayMode, isFetching} = this.props
 
-  const Spinner = () => (
-    <div style={styles.spinner}>
-      <img src="./images/spinner.gif"
-        role="presentation" />
-    </div>
-  );
+    return (
+      <div>
+        {isFetching ?  <Spinner /> : null}
 
-  const bookMarkup = () => {
-    let components = null;
-    let bookItems = (<span>No items!</span>);
-
-    if (books.length > 0) {
-      components = books.map(item => {
-        if (item.volumeInfo.imageLinks) {
-          // Need different keys for different display modes
-          // to trigger <ReactCSSTransitionGroup> animations
-          
-          const key = displayMode === 'THUMBNAIL' ? 
-                                       item.id + 1 : 
-                                       item.id;
-          bookItems = (
-            <Book item={item} 
-              displayMode={displayMode}
-              key={key} />);
-        }
-        return bookItems;
-      });
-    }
-    return components;
-  };
-
-  return (
-    <div>
-      { currentStatus !== 'Fetching...' ?  null : <Spinner /> }
-    
-      <div style={styles.container}>
-        <ReactCSSTransitionGroup transitionName="books"
-          transitionLeaveTimeout={1}
-          transitionEnterTimeout={1000}>
-          {bookMarkup()}
-        </ReactCSSTransitionGroup>
+        <div style={{
+          width: '100%',
+        }}>
+          <TransitionGroup>
+            {books.map(book => {
+                // Need different keys for different display modes
+                // to trigger <CSSTransition> animations
+                return (
+                  <CSSTransition
+                    key={displayMode === 'THUMBNAIL' ?
+                           book.id + 'thumb' :
+                           book.id}
+                    classNames="books"
+                    timeout={{enter: 1000, exit: 1}}
+                  >
+                    <Book item={book} displayMode={displayMode}/>
+                  </CSSTransition>
+                )
+            })}
+          </TransitionGroup>
+        </div>
       </div>
-    </div>
-  );
-};
+    )
+  }
+}
 
-Books.propTypes = {
-  books:       React.PropTypes.array.isRequired,
-  currentStatus: React.PropTypes.string.isRequired,
-  displayMode: React.PropTypes.string.isRequired,
-};
+const mapStateToProps = state => ({
+  books:         state.books,
+  displayMode:   state.displayMode,
+  isFetching:    state.currentStatus === 'Fetching...',
+})
 
-export default Books;
+export default connect(
+  mapStateToProps,
+  null
+)(Books)

@@ -1,68 +1,65 @@
-import React from 'react';
+// @flow
+import React, {Component} from 'react'
+import {connect} from 'react-redux'
+import {setDisplayMode} from '../actions'
 
-require('./book.css');
+class DisplayMode extends Component<{
+  displayMode: string,
+  switchToListing: () => void,
+  switchToThumbnail: () => void,
+}> {
+  render () {
+    const {displayMode, switchToListing, switchToThumbnail} = this.props
 
-const DisplayMode = ({
-  setListing,
-  setThumbnail,
-  displayMode,
-}) => {
-  const switchToListing = () => {
-    setListing();
-  };
-
-  const switchToThumbnail = () => {
-    setThumbnail();
-  };
-
-  const styles = {
-    radio: {
+    const radioStyle = {
       marginLeft: '10px',
       cursor: 'pointer',
-    },
+    }
 
-    radiospan: {
+    const labelStyle = {
       marginLeft: '20px',
-      fontFamily: 'tahoma',
       fontSize: '16px',
-    },
-  };
+    }
 
-  return (
-    <span>
-      <span style={styles.radiospan}>
-        Thumbnail
+    return (
+      <span>
+        <span style={labelStyle}>
+          Thumbnail
+        </span>
+
+        <input type="radio"
+          name="display"
+          style={radioStyle}
+          onChange={switchToThumbnail}
+          checked={displayMode === 'THUMBNAIL'}
+          value="thumbnail" />
+
+        <span style={labelStyle}>
+          List
+        </span>
+
+        <input type="radio"
+          name="display"
+          style={radioStyle}
+          onChange={switchToListing}
+          checked={displayMode !== 'THUMBNAIL'}
+          value="list" />
       </span>
+    )
+  }
+}
 
-      <input type="radio"
-        name="display"
-        style={styles.radio}
-        onChange={switchToThumbnail}
-        checked={displayMode === 'THUMBNAIL'}
-        value="thumbnail" />
+const mapDispatchToProps = dispatch => ({
+  switchToListing: () => {
+    dispatch(setDisplayMode('LISTING'))
+  },
 
-      <span style={styles.radiospan}>
-        List
-      </span>
+  switchToThumbnail: () => {
+    dispatch(setDisplayMode('THUMBNAIL'))
+  },
+})
 
-      <input type="radio"
-        name="display"
-        style={styles.radio}
-        onChange={switchToListing}
-        checked={displayMode !== 'THUMBNAIL'}
-        value="list" />
-    </span>
-  );
-};
-
-DisplayMode.contextTypes = {
-  store: React.PropTypes.object.isRequired,
-};
-
-DisplayMode.propTypes = {
-  setListing: React.PropTypes.func.isRequired,
-  setThumbnail: React.PropTypes.func.isRequired,
-  displayMode: React.PropTypes.string.isRequired,
-};
-
-export default DisplayMode;
+export default connect(
+  null,
+  mapDispatchToProps
+)(DisplayMode)

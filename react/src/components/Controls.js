@@ -1,31 +1,36 @@
-import React from 'react';
-import DisplayModeContainer from '../containers/displayMode';
-import TopicSelectorContainer from '../containers/topicselector';
-import HistoryContainer from '../containers/history';
+// @flow
+import React, {Component} from 'react'
+import {connect} from 'react-redux'
+import DisplayMode from './DisplayMode'
+import History from './History'
+import TopicSelector from './TopicSelector'
 
-const Controls = ({ 
-  topic,
-  displayMode,
-}) => {
-  const styles = {
-    controls: {
-      padding: '15px',
-      marginBottom: '25px',
-    },
-  };
+class Controls extends Component<{
+  topic: string,
+  displayMode: string,
+}> {
+  render () {
+    const {topic, displayMode} = this.props
 
-  return (
-    <div style={styles.controls}>
-      <TopicSelectorContainer topic={topic} />
-      <DisplayModeContainer displayMode={displayMode} />
-      <HistoryContainer />
-    </div>
-  );
-};
+    return (
+      <div style={{
+        padding: '15px',
+        marginBottom: '25px',
+      }}>
+        <TopicSelector topic={topic} />
+        <DisplayMode displayMode={displayMode} />
+        <History />
+      </div>
+    )
+  }
+}
 
-Controls.propTypes = {
-  displayMode: React.PropTypes.string.isRequired,
-  topic: React.PropTypes.string.isRequired,
-};
+const mapStateToProps = state => ({
+  topic: state.topic,
+  displayMode: state.displayMode,
+})
 
-export default Controls;
+export default connect(
+  mapStateToProps,
+  null
+)(Controls)

@@ -1,67 +1,74 @@
-import React from 'react';
+// @flow
+import React, {Component} from 'react'
+import {connect} from 'react-redux'
+import {undo, redo, gotoState} from '../actions'
+import stateHistory from '../statehistory'
 
-export const History = ({
-  past, present, future,
-  undo, redo, gotoState,
-}) => {
-  const styles = {
-    container: {
-      marginLeft: '20px',
-      cursor: 'pointer',
-    },
+class History extends Component<{
+  past: Array<Object>,
+  present: Object,
+  future: Array<Object>,
+  undo: () => void,
+  redo: () => void,
+  gotoState: (Number) => void,
+}> {
+  render () {
+    const {past, present, future, undo, redo, gotoState} = this.props
 
-    link: { textDecoration: 'none' },
-    input: { cursor: 'pointer' },
-  };
+    const max =
+      (past    ? past.length   : 0) +
+      (present ? 1 : 0)             +
+      (future  ? future.length : 0) - 1
 
-  const RightArrow = () => (
-    <a href="#"
-      style={styles.link}
-      onClick={() => redo()}
-    >
-      &#8594;
-    </a>
-  );
+    const value = past ? past.length : 0
 
-  const LeftArrow = () => (
-    <a href="#"
-      style={styles.link}
-      onClick={() => undo()}
-    >
-      &#8592;
-    </a>
-  );
+    return (
+      <span style={{
+        marginLeft: '20px',
+        cursor: 'pointer',
+      }}>
+        History
 
-  const max = () => 
-    (past    ? past.length   : 0) +
-    (present ? 1 : 0)             +
-    (future  ? future.length : 0) - 1;
+        <input type="range"
+          style={{ cursor: 'pointer' }}
+          min={0}
+          max={max}
+          value={value}
+          onChange={event => gotoState(event.target.value)} />
 
-  const value = () => past ? past.length : 0;
-  
-  return (
-    <span style={styles.container}>
-      History
+        <button onClick={undo}
+          disabled={!past || past.length === 0}
+        >◀</button>
 
-      <input type="range"
-        style={styles.input}
-        min={0} 
-        max={max()} 
-        value={value()}
-        onChange={event => gotoState(event.target.value)} />
+        <button onClick={redo}
+          disabled={!future || future.length === 0}
+        >▶</button>
+      </span>
+    )
+  }
+}
 
-      { (past   && past.length   > 0) ? <LeftArrow />  : null }
-      { (future && future.length > 0) ? <RightArrow /> : null }
-    </span>
-  );
-};
+const mapStateToProps = () => ({
+  past: stateHistory.past,
+  present: stateHistory.present,
+  future: stateHistory.future,
+})
 
-History.propTypes = {
-  past: React.PropTypes.array.isRequired,
-  present: React.PropTypes.object.isRequired,
-  future: React.PropTypes.array.isRequired,
+const mapDispatchToProps = dispatch => ({
+  undo: () => {
+    dispatch(undo())
+  },
 
-  undo: React.PropTypes.func.isRequired,
-  redo: React.PropTypes.func.isRequired,
-  gotoState: React.PropTypes.func.isRequired,
-};
+  redo: () => {
+    dispatch(redo())
+  },
+
+  gotoState: stateIndex => {
+    dispatch(gotoState(stateIndex))
+  },
+})
+
+export default connect (
+  mapStateToProps,
+  mapDispatchToProps
+)(History)

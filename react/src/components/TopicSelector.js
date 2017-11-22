@@ -1,74 +1,81 @@
-import React from 'react';
+// @noflow
+import React, {Component} from 'react'
+import {connect} from 'react-redux'
+import {setTopic, fetchBooks} from '../actions'
 
-export default class TopicSelector extends React.Component {
-  constructor(props) {
-    super(props);
-    this.props = props;
+class TopicSelector extends Component<{
+  topic: string,
+  setTopic: (string) => void,
+  fetchTopic: (string) => void,
+}> {
+  input:?HTMLInputElement = null
 
-    this.handleChange = this.handleChange.bind(this);
-    this.handleKeyPress = this.handleKeyPress.bind(this);
+  putCursorAtEnd(input:HTMLInputElement) {
+    const value = input.value
+    input.value = ''
+    input.value = value
   }
 
   componentDidMount() {
-    function putCursorAtEnd(input) {
-      const value = input.value;
-      input.value = '';
-      input.value = value;
+    if (this.input) {
+      this.input.focus()
+      this.putCursorAtEnd(this.input)
     }
-
-    const input = this.refs.input;
-
-    input.focus();
-    putCursorAtEnd(input);
   }
 
-  handleChange(event) {
-    this.props.setTopic(event.target.value);
+  handleChange = (event) => {
+    this.props.setTopic(event.target.value)
   }
 
-  handleKeyPress(event) {
+  handleKeyPress = (event) => {
     if (event.key === 'Enter') {
-      this.props.fetchTopic(event.target.value);
+      this.props.fetchTopic(event.target.value)
     }
   }
 
   render() {
-    const styles = {
-      topic: {
-        marginRight: '10px',
-        fontFamily: 'tahoma',
-        fontSize: '18px',
-      },
-
-      input: {
-        fontFamily: 'tahoma',
-        fontSize: '16px',
-        marginRight: '10px',
-      },
-    };
-
-    const topic = this.props.topic;
+    const topic = this.props.topic
 
     return (
       <span>
-        <span style={styles.topic}>
+        <span style={{
+          marginRight: '10px',
+          fontSize: '18px',
+        }}>
           Topic
         </span>
 
         <input type="text"
-          ref="input"
-          style={styles.input}
+          ref={(el)=>{this.input=el}}
+          style={{
+            fontSize: '16px',
+            marginRight: '10px',
+          }}
           value={topic}
           onChange={this.handleChange}
           onKeyPress={this.handleKeyPress}
         />
       </span>
-    );
+    )
   }
 }
 
-TopicSelector.propTypes = {
-  topic: React.PropTypes.string.isRequired,
-  setTopic: React.PropTypes.func.isRequired,
-  fetchTopic: React.PropTypes.func.isRequired,
-};
+const mapStateToProps = state => ({
+  topic: state.topic,
+})
+
+const mapDispatchToProps = dispatch => ({
+  setTopic: topic => {
+    dispatch(setTopic(topic))
+  },
+
+  fetchTopic: topic => {
+    dispatch(setTopic(topic))
+    dispatch(fetchBooks())
+  },
+})
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(TopicSelector)

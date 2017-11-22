@@ -1,96 +1,97 @@
-import { combineReducers } from 'redux';
-import stateHistory from './statehistory';
+// @noflow
+import {combineReducers} from 'redux'
+import stateHistory from './statehistory'
 
 const defaults = {
   STATUS:       'Starting the application',
   TOPIC:        'javascript',
   DISPLAY_MODE: 'THUMBNAIL',
   STATE:        [],
-};
+}
 
-const fetchReducer = (state = defaults.STATE, action) => {
+const fetchReducer = (state:Array<Object> = defaults.STATE, action) => {
   switch (action.type) {
     case 'FETCH_STARTED':
-      return [];
+      return []
 
     case 'FETCH_FAILED':
       alert('Fetch failed. Check your internet connection ' +
-            'or change the query.');
+            'or change the query.')
 
-      return [];
+      return []
 
     case 'FETCH_COMPLETE':
-      return action.json.items;
+      return action.json.items
 
-    default: 
-      return state;
+    default:
+      return state
   }
-};
+}
 
 const statusReducer = (state = defaults.STATUS, action) => {
   switch (action.type) {
     case 'FETCH_STARTED':
-      return 'Fetching...';
+      return 'Fetching...'
 
     case 'FETCH_COMPLETE':
-      return 'Fetch complete';
+      return 'Fetch complete'
 
     case 'FETCH_FAILED':
-      return 'Fetch failed ' + (action.error ? action.error : '');
+      return 'Fetch failed ' + (action.error ? action.error : '')
 
     case 'SET_TOPIC':
-      return 'Set topic to ' + action.topic;
+      return 'Set topic to ' + action.topic
 
     case 'SET_DISPLAY_MODE':
-      return 'Set display mode to ' + action.displayMode;
+      return 'Set display mode to ' + action.displayMode
 
     default:
-      return state;
+      return state
   }
-};
+}
 
 const topicReducer = (state = defaults.TOPIC, action) => {
   switch (action.type) {
     case 'SET_TOPIC':
-      return action.topic;
+      return action.topic
 
     default:
-      return state;
+      return state
   }
-};
+}
 
 const bookDisplayReducer = (state = defaults.DISPLAY_MODE, action) => {
   switch (action.type) {
     case 'SET_DISPLAY_MODE':
-      return action.displayMode;
+      return action.displayMode
 
     default:
-      return state;
+      return state
   }
-};
+}
 
 const undo = reducer => (state = stateHistory.present, action) => {
   switch (action.type) {
-    case 'UNDO': 
-      stateHistory.undo();  
-      break;
+    case 'UNDO':
+      stateHistory.undo()
+      break
 
     case 'REDO': {
-      stateHistory.redo();
-      break;
+      stateHistory.redo()
+      break
     }
     case 'GOTO': {
-      stateHistory.gotoState(action.stateIndex);
-      break;
+      stateHistory.gotoState(action.stateIndex)
+      break
     }
     default: {
-      const newState = reducer(state, action);
-      stateHistory.push(newState);
+      const newState = reducer(state, action)
+      stateHistory.push(newState)
     }
   }
 
-  return stateHistory.present;
-};
+  return stateHistory.present
+}
 
 // Combine reducers
 
@@ -99,4 +100,4 @@ export default undo(combineReducers({
   topic:         topicReducer,
   currentStatus: statusReducer,
   displayMode:   bookDisplayReducer,
-}));
+}))

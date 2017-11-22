@@ -1,50 +1,40 @@
-import React from 'react';
+// @flow
+import React, {Component} from 'react'
+import prohibited_image from '../images/prohibited.svg'
 
-const Book = ({
-  item,
-  displayMode,
-}) => {
-  const styles = {
-    links: {
-      marginTop: '20px',
-    },
+class Book extends Component<{
+  item: Object,
+  displayMode: string,
+}> {
+  render () {
+    const {item, displayMode} = this.props
+    const link = item.volumeInfo.canonicalVolumeLink
+    const title = item.volumeInfo.title
+    const image = item.volumeInfo.imageLinks && item.volumeInfo.imageLinks.thumbnail ?
+      item.volumeInfo.imageLinks.thumbnail :
+      prohibited_image
 
-    link: {
-      padding: '25px',
-    },
+    if (displayMode === 'THUMBNAIL') {
+      return (
+        <a href={link} style={{padding: '25px'}}>
+          <img src={image}
+            style={{
+              boxShadow: '3px 3px 3px #686868',
+              marginBottom: '15px',
+            }}
+            alt={title} />
+        </a>
+      )
+    } else {
+      return (
+        <div style={{marginTop: '20px'}}>
+          <a href={link} style={{padding: '25px'}}>
+            {title}
+          </a>
+        </div>
+      )
+    }
+  }
+}
 
-    image: {
-      boxShadow: '3px 3px 3px #686868',
-      marginBottom: '15px',
-    },
-  };
-
-  const linkMarkup = (currentItem, link) => (
-    <div style={styles.links}>
-      <a href={link} style={styles.link}>
-        {currentItem.volumeInfo.title}
-      </a>
-    </div>
-  );
-
-  const thumbnailMarkup = (currentItem, link) => (
-    <a href={link} style={styles.link}>
-      <img src={currentItem.volumeInfo.imageLinks.thumbnail}
-        style={styles.image} 
-        role="presentation" /> 
-    </a>
-  );
-
-  const link = item.volumeInfo.canonicalVolumeLink;
-
-  return displayMode === 'THUMBNAIL' ?
-           thumbnailMarkup(item, link) :
-           linkMarkup     (item, link);
-};
-
-Book.propTypes = {
-  item:        React.PropTypes.object.isRequired,
-  displayMode: React.PropTypes.string.isRequired,
-};
-
-export default Book;
+export default Book

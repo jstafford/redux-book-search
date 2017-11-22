@@ -1,60 +1,59 @@
-import React from 'react';
+// @noflow
+import React, {Component} from 'react'
+import {connect} from 'react-redux'
+import stateHistory from '../statehistory'
 
-const StateViewer = ({
-  topic,
-  books,
-  currentStatus,
-  displayMode,
-  history,
-}) => {
-  const styles = {
-    container: {
-      margin: '20px',
-      width: '400px',
-      fontFamily: 'tahoma',
-    },
+class StateViewer extends Component<{
+  topic: string,
+  books: Array<Object>,
+  currentStatus: string,
+  displayMode: string,
+  history: StateHistory,
+}> {
+  render () {
+    const {topic, books, currentStatus, displayMode, history} = this.props
 
-    title: {
-      fontSize: '24px',
-      marginTop: '25px',
-    },
+    return (
+      <div style={{
+        margin: '20px',
+        width: '400px',
+      }}>
+        <hr style={{
+          marginTop: '50px',
+        }} />
 
-    state: {
-      marginTop: '10px',
-    },
+        <div style={{
+          fontSize: '24px',
+          marginTop: '25px',
+        }}>
+          Application State
+        </div>
 
-    hr: {
-      marginTop: '50px',
-    },
-  };
+        <div style={{
+          marginTop: '10px',
+        }}>
+          Topic: {topic}<br />
 
-  return (
-    <div style={styles.container}>
-      <hr style={styles.hr} />
-
-      <div style={styles.title}>
-        Application State
+          Display mode:      { displayMode }<br />
+          Current status:    { currentStatus }<br />
+          Books displayed:   { books.length }<br />
+          Actions processed: { history.past.length + history.future.length + 1 }<br />
+          Current action:    { history.past.length + 1 }
+        </div>
       </div>
+    )
+  }
+}
 
-      <div style={styles.state}>
-        Topic: {topic}<br />
+const mapStateToProps = state => ({
+  books:         state.books,
+  topic:         state.topic,
+  currentStatus: state.currentStatus,
+  displayMode:   state.displayMode,
+  history:       stateHistory,
+})
 
-        Display mode:      { displayMode }<br />
-        Current status:    { currentStatus }<br />
-        Books displayed:   { books.length }<br />
-        Actions processed: { history.past.length + history.future.length + 1 }<br />
-        Current action:    { history.past.length + 1 }
-      </div>
-    </div>
-  );
-};
-
-StateViewer.propTypes = {
-  books: React.PropTypes.array.isRequired,
-  currentStatus: React.PropTypes.string.isRequired,
-  displayMode: React.PropTypes.string.isRequired,
-  history: React.PropTypes.object.isRequired,
-  topic: React.PropTypes.string.isRequired,
-};
-
-export default StateViewer;
+export default connect(
+  mapStateToProps,
+  null
+)(StateViewer)

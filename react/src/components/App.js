@@ -1,26 +1,21 @@
-import React from 'react';
-import ControlsContainer from './controls';
-import BooksContainer from './books';
-import StateViewerContainer from './stateviewer';
+// @flow
+import React, {Component} from 'react'
+import Books from './Books'
+import Controls from './Controls'
+import StateViewer from './StateViewer'
+import Title from './Title'
+import './book.css'
 
-const titleStyle = {
-  fontFamily: 'tahoma',
-  fontSize: '24px',
-  textAlign: 'center',
-};
-
-const Title = () => (
-  <div style={titleStyle}>
-    Book Search
-  </div>
-);
-
-export default () => (
-  <div>
-    <Title />
-    <hr />
-    <ControlsContainer />
-    <BooksContainer />
-    <StateViewerContainer />
-  </div>
-);
+export default class App extends Component<{}> {
+  render () {
+    return (
+      <div>
+        <Title />
+        <hr />
+        <Controls />
+        <Books />
+        <StateViewer />
+      </div>
+    )
+  }
+}
